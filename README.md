@@ -1,5 +1,4 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/Fv7mIedl)
-# Music Streaming Platform - Programming II Assignment
+# Music Streaming Platform - IMC University of Applied Sciences: Programming II Assignment
 
 A Python 3.10+ object-oriented programming exercise. Your task is to implement the streaming platform domain model based on the specifications below.
 
@@ -228,35 +227,6 @@ Each file in `src/streaming/` contains a docstring specifying which classes must
 
 
 
-## 📚 Hints & Tips
-
-1. **Read the test files first** - They show you exactly what's expected
-2. **Look at `conftest.py`** - It contains example data and shows how the classes should be used
-3. **Implement classes in order** - Start with base classes before subclasses:
-   - First: `Track`, `User`, `Artist`, `Album`, `Playlist`, `ListeningSession`
-   - Then: Subclasses of the above
-   - Finally: `StreamingPlatform` with all its methods
-4. **Use type hints** - The provided docstrings include parameter and return type hints
-5. **Test frequently** - Run `pytest` after implementing each class
-6. **Check inheritance** - Make sure subclasses properly call `super().__init__()`
-
----
-
-## 🔄 Continuous Integration
-
-Every push to this repository automatically runs all tests via GitHub Actions.
-Check the **Actions** tab to see if your implementation passes.
-
----
-
-## 📖 Additional Resources
-
-- **Python docs**: https://docs.python.org/3/
-- **pytest docs**: https://docs.pytest.org/
-- **Type hints**: https://docs.python.org/3/library/typing.html
-
----
-
 ## ❓ Troubleshooting
 
 ### "ModuleNotFoundError: No module named 'streaming'"
@@ -278,12 +248,3 @@ pip install pytest
 ```
 
 ---
-
-## 📞 Need Help?
-
-- Check the test files for expected behavior
-- Read the docstrings in skeleton files
-- Ask your instructor or classmates
-- Review the provided class diagram (ClassDiagram.puml)
-
-**Good luck! 🎵**
