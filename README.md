@@ -1,250 +1,109 @@
-# Music Streaming Platform - IMC University of Applied Sciences: Programming II Assignment
+# Music Streaming Platform
 
-A Python 3.10+ object-oriented programming exercise. Your task is to implement the streaming platform domain model based on the specifications below.
+An object-oriented model of a music streaming platform (like Spotify), written in **Python**. It manages artists, albums, songs, podcasts and audiobooks, different user types and playlists, records listening sessions, and answers **10 analytics questions** about listening behaviour, such as *"Who are the top artists by listening time?"* or *"Which users have listened to a whole album?"*
 
----
+Built as a university project for the Programming II course at IMC University of Applied Sciences Krems.
 
-## 🎯 Your Assignment
+## Features
 
-You have been hired by a major music industry corporation to build the prototype of a **music streaming platform**. This platform will serve as the foundation for managing a vast ecosystem of artists, albums, tracks, and millions of listening sessions.
+- **Domain model with 18 classes** using inheritance and composition
+  - **Content:** `Track` → `Song` (`SingleRelease`, `AlbumTrack`), `Podcast` (`InterviewEpisode`, `NarrativeEpisode`), `AudiobookTrack`
+  - **Users:** `User` → `FreeUser`, `PremiumUser`, `FamilyAccountUser` with `FamilyMember` sub-accounts
+  - **Organisation:** `Artist`, `Album` (tracks kept in order), `Playlist`, `CollaborativePlaylist` (multiple contributors)
+  - **Activity:** `ListeningSession` records who listened to what, when, and for how long
+- **Central `StreamingPlatform` class** for registering and looking up tracks, users, artists, albums, playlists and sessions
+- **10 analytics queries** (see below)
+- **Automated tests** with pytest
 
-### Business Requirements
+## Class diagram
 
-Your platform must:
-- **Manage content**: Artists, albums (with track ordering), individual tracks (songs, podcasts, audiobooks), and their metadata
-- **Handle users**: Support different user tiers (free, premium) and family sharing accounts with sub-users
-- **Track activity**: Record when users listen to tracks, including duration and timestamp
-- **Organize content**: Allow users to create personalized and collaborative playlists
-- **Analyze behavior**: Provide powerful analytics to understand user engagement, discover trending artists, and optimize the platform
+![Class diagram](StreamingPlatform.png)
 
-### Your Challenge
+The diagram source is in `ClassDiagram.puml` (PlantUML).
 
-Implement a robust **domain model** (18 classes) that captures all these requirements. Your implementation will be tested against a comprehensive test suite simulating real-world usage patterns. You must also implement **10 analytical query methods** that provide business intelligence on user listening behavior, artist popularity, album completion rates, and more.
+## Analytics queries
 
----
+| # | Method | What it answers |
+|---|---|---|
+| Q1 | `total_listening_time_minutes(start, end)` | Total listening time across all users in a time window |
+| Q2 | `avg_unique_tracks_per_premium_user(days=30)` | Average number of different tracks a premium user played recently |
+| Q3 | `track_with_most_distinct_listeners()` | The track heard by the most different users |
+| Q4 | `avg_session_duration_by_user_type()` | Average session length per user type, longest first |
+| Q5 | `total_listening_time_underage_sub_users_minutes(age_threshold=18)` | Listening time of family members under a given age |
+| Q6 | `top_artists_by_listening_time(n=5)` | Top artists by total listening time (songs only) |
+| Q7 | `user_top_genre(user_id)` | A user's favourite genre and its share of their listening time |
+| Q8 | `collaborative_playlists_with_many_artists(threshold=3)` | Collaborative playlists with songs from many different artists |
+| Q9 | `avg_tracks_per_playlist_type()` | Average playlist size for standard vs. collaborative playlists |
+| Q10 | `users_who_completed_albums()` | Users who listened to every track of an album, and which albums |
 
-## 📁 Project Structure & Class Diagram
+## Tech stack
 
-![StreamingPlatform Class Diagram](StreamingPlatform.png)
+- Python 3.12
+- pytest
+- PlantUML (class diagram)
 
-The diagram above visualizes the complete domain model with all classes, their relationships, and the package organization.
+## Project structure
 
----
-
-## 🔍 Query Methods to Implement in StreamingPlatform
-
-Your goal is to implement the `StreamingPlatform` class with methods that allow you to perform complex queries on the platform data. These methods will be used to analyze user behavior, track popularity, and gain insights into how the platform is being used.
-
-These methods perform analytical queries on the platform data. Implement each of the following 10 methods in the `StreamingPlatform` class:
-
-### Q1: Total Cumulative Listening Time
-**Method:** `total_listening_time_minutes(start: datetime, end: datetime) -> float`
-
-Return the total cumulative listening time (in minutes) across all users for a given time period. Sum up the listening duration for all sessions that fall within the specified datetime window (inclusive on both ends).
-
----
-
-### Q2: Average Unique Tracks per Premium User
-**Method:** `avg_unique_tracks_per_premium_user(days: int = 30) -> float`
-
-Compute the average number of unique tracks listened to per `PremiumUser` in the last `days` days (default 30). Only count distinct tracks for sessions within the time window. Return 0.0 if there are no premium users.
-
----
-
-### Q3: Track with Most Distinct Listeners
-**Method:** `track_with_most_distinct_listeners() -> Track | None`
-
-Return the track with the highest number of distinct listeners (not total plays) in the catalogue. Count the number of unique users who have listened to each track and return the one with the most. Return `None` if no sessions exist.
-
----
-
-### Q4: Average Session Duration by User Type
-**Method:** `avg_session_duration_by_user_type() -> list[tuple[str, float]]`
-
-For each user subtype (e.g., `FreeUser`, `PremiumUser`, `FamilyAccountUser`, `FamilyMember`), compute the average session duration (in seconds) and return them ranked from longest to shortest. Return as a list of `(type_name, average_duration_seconds)` tuples.
-
----
-
-### Q5: Total Listening Time for Underage Sub-Users
-**Method:** `total_listening_time_underage_sub_users_minutes(age_threshold: int = 18) -> float`
-
-Return the total listening time (in minutes) attributed to tracks associated with `FamilyAccountUser` sub-accounts where the sub-account holder (i.e., `FamilyMember`) is under the specified age threshold (default 18, exclusive). For example, with threshold 18, count only family members with age < 18.
-
----
-
-### Q6: Top Artists by Listening Time
-**Method:** `top_artists_by_listening_time(n: int = 5) -> list[tuple[Artist, float]]`
-
-Identify the top `n` artists (default 5) ranked by total cumulative listening time across all their tracks. Only count listening time for tracks where `isinstance(track, Song)` is true (exclude podcasts and audiobooks). Return as a list of `(Artist, total_minutes)` tuples, sorted from highest to lowest listening time.
-
----
-
-### Q7: User's Top Genre
-**Method:** `user_top_genre(user_id: str) -> tuple[str, float] | None`
-
-Given a user ID, return their most frequently listened-to genre and the percentage of their total listening time it accounts for. Return a `(genre, percentage)` tuple where percentage is in the range [0, 100], or `None` if the user doesn't exist or has no listening history.
-
----
-
-### Q8: Collaborative Playlists with Many Artists
-**Method:** `collaborative_playlists_with_many_artists(threshold: int = 3) -> list[CollaborativePlaylist]`
-
-Return all `CollaborativePlaylist` instances that contain tracks from more than `threshold` (default 3) distinct artists. Only `Song` tracks count toward the artist count (exclude `Podcast` and `AudiobookTrack` which don't have artists). Return playlists in the order they were registered.
-
----
-
-### Q9: Average Tracks per Playlist Type
-**Method:** `avg_tracks_per_playlist_type() -> dict[str, float]`
-
-Compute the average number of tracks per playlist, distinguishing between standard `Playlist` and `CollaborativePlaylist` instances. Return a dictionary with keys `"Playlist"` and `"CollaborativePlaylist"` mapped to their respective averages. Return 0.0 for a type with no instances.
-
----
-
-### Q10: Users Who Completed Albums
-**Method:** `users_who_completed_albums() -> list[tuple[User, list[str]]]`
-
-Identify users who have listened to every track on at least one complete `Album` and return the corresponding album titles. A user "completes" an album if their session history includes at least one listen to each track on that album. Return as a list of `(User, [album_title, ...])` tuples in registration order. Albums with no tracks are ignored.
-
----
-
-
-## 🚀 Setup Instructions
-
-### 1️⃣ Clone or Extract the Repository
-
-```bash
-cd music_streaming_platform
+```
+src/streaming/
+├── tracks.py       Track hierarchy (songs, podcasts, audiobooks)
+├── users.py        User hierarchy (free, premium, family accounts)
+├── artists.py      Artist
+├── albums.py       Album
+├── playlists.py    Playlist and CollaborativePlaylist
+├── sessions.py     ListeningSession
+└── platform.py     StreamingPlatform: registry and analytics queries
+tests/
+├── test_public.py  Tests for the 10 analytics queries
+└── unit_tests/     Tests for the individual classes
 ```
 
-### 2️⃣ Create a Python Virtual Environment
+## Installation
 
-A virtual environment isolates your project dependencies. You should do this before running any code.
+**Requirements:** Python 3.12 or newer.
 
-#### On macOS / Linux:
 ```bash
+git clone https://github.com/Chris-Markovic/REPO-NAME.git
+cd REPO-NAME
 python3 -m venv venv
-source venv/bin/activate
-```
-
-#### On Windows (PowerShell):
-```bash
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-```
-
-#### On Windows (Command Prompt):
-```bash
-python -m venv venv
-venv\Scripts\activate.bat
-```
-
-**Verify your venv is active** - you should see `(venv)` in your terminal prompt.
-
-### 3️⃣ Install Dependencies
-
-```bash
-pip install --upgrade pip
-pip install pytest
+source venv/bin/activate        # macOS / Linux
+# venv\Scripts\activate         # Windows
 pip install -e .
 ```
 
----
+## Usage example
 
-## ✅ Running Tests
+```python
+from datetime import datetime
+from streaming.platform import StreamingPlatform
+from streaming.artists import Artist
+from streaming.tracks import Song
+from streaming.users import PremiumUser
+from streaming.sessions import ListeningSession
 
-### Run All Tests
-```bash
-pytest
+platform = StreamingPlatform("MyStream")
+
+artist = Artist("a1", "The Example Band", "rock")
+song = Song("t1", "First Song", 210, "rock", artist)
+artist.add_track(song)
+user = PremiumUser("u1", "Anna", 25, subscription_start=datetime(2026, 1, 1))
+
+platform.add_artist(artist)
+platform.add_track(song)
+platform.add_user(user)
+
+session = ListeningSession("s1", user, song, datetime.now(), 180)  # listened for 180 seconds
+platform.record_session(session)
+user.add_session(session)
+
+print(platform.top_artists_by_listening_time(n=1))  # [(<Artist>, 3.0)]
+print(platform.user_top_genre("u1"))                # ('rock', 100.0)
 ```
 
-### Run All Unit Tests
+## Running the tests
+
 ```bash
-pytest tests/unit_tests/ -v
+pytest                          # all tests
+pytest tests/unit_tests/ -v     # only the class tests
+pytest tests/test_public.py -v  # only the analytics queries
 ```
-
-### Run a Specific Test File
-```bash
-# Test only the Track classes
-pytest tests/unit_tests/test_tracks.py -v
-
-# Test only the Platform class
-pytest tests/unit_tests/test_platform_registry.py -v
-pytest tests/unit_tests/test_platform_sessions.py -v
-```
-
-### Run Tests with Output
-```bash
-# Show print statements and detailed output
-pytest -v -s
-```
-
-### Run Tests and Stop on First Failure
-```bash
-pytest -x
-```
-
----
-
-## 📋 Implementation Checklist
-
-Each file in `src/streaming/` contains a docstring specifying which classes must be implemented.
-
-### tracks.py
-- [ ] `Track` - Abstract base class for all playable content
-- [ ] `Song` - Music track associated with an artist
-- [ ] `SingleRelease` - Song released as standalone single
-- [ ] `AlbumTrack` - Song that is part of an album
-- [ ] `Podcast` - Podcast episode
-- [ ] `InterviewEpisode` - Interview-format podcast
-- [ ] `NarrativeEpisode` - Narrative-format podcast
-- [ ] `AudiobookTrack` - Chapter/section from an audiobook
-
-### users.py
-- [ ] `User` - Base class for all users
-- [ ] `FreeUser` - Free tier user with limited features
-- [ ] `PremiumUser` - Paid subscriber with full access
-- [ ] `FamilyAccountUser` - Premium user managing family account
-- [ ] `FamilyMember` - User profile belonging to a family account
-
-### artists.py
-- [ ] `Artist` - Music artist or content creator
-
-### albums.py
-- [ ] `Album` - Ordered collection of AlbumTrack objects
-
-### playlists.py
-- [ ] `Playlist` - User-curated ordered collection of tracks
-- [ ] `CollaborativePlaylist` - Playlist with multiple contributors
-
-### sessions.py
-- [ ] `ListeningSession` - Records a user listening to a track
-
-### platform.py
-- [ ] `StreamingPlatform` - Central platform orchestrating all entities
-  - Registration methods: `add_track()`, `add_user()`, `add_artist()`, `add_album()`, `add_playlist()`, `record_session()`
-  - Accessors: `get_track()`, `get_user()`, `get_artist()`, `get_album()`, `all_users()`, `all_tracks()`
-  - **10 Query Methods** (Q1-Q10) - See section below
-
-
-
-## ❓ Troubleshooting
-
-### "ModuleNotFoundError: No module named 'streaming'"
-Make sure you have:
-1. ✅ Created and activated your virtual environment
-2. ✅ Installed the package: `pip install -e .`
-3. ✅ Are in the correct directory: `cd music_streaming_platform`
-
-### Tests import but don't run
-Run with verbose output to see errors:
-```bash
-pytest -v
-```
-
-### "pytest not found"
-Install it:
-```bash
-pip install pytest
-```
-
----
